@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         Skribbl Essentials 1.0
 // @version      1.0
-// @namespace    http://tampermonkey.net
 // @description  Provides a list of potential words for skribbl.io
 // @author       Databones
 // @match        *://skribbl.io/*
