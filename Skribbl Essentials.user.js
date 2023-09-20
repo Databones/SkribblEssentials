@@ -5,6 +5,7 @@
 // @author       Databones
 // @match        *://skribbl.io/*
 // @license      MIT
+// @namespace    skribblessentials
 // @icon         https://raw.githubusercontent.com/Databones/SkribblEssentials/main/SkribblEssentials.png
 // ==/UserScript==
 
