@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         Skribbl Essentials 1.0
 // @version      1.0
+// @namespace    skribblessentials
 // @description  Provides a list of potential words for skribbl.io
 // @author       Databones
 // @match        *://skribbl.io/*
