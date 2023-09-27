@@ -569,14 +569,12 @@
             chatInput.value = lowercaseWord;
             clickedButtons.add(lowercaseWord);
 
-            // Trigger an input event on the chat input field
             const inputEvent = new Event('input', {
                 bubbles: true,
                 cancelable: true,
             });
             chatInput.dispatchEvent(inputEvent);
 
-            // Optionally, trigger a submit event if you want to submit the form
             const submitEvent = new Event('submit', {
                 bubbles: true,
                 cancelable: true,
