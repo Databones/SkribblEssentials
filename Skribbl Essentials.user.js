@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         Skribbl Essentials 2.0
-// @version      2.0
+// @name         Skribbl Essentials 2.1
+// @version      2.1
 // @description  Provides a list of potential words for skribbl.io
 // @author       Databones
 // @match        *://skribbl.io/*
@@ -26,7 +26,7 @@
 
     const customLogoDiv = document.createElement('div');
     customLogoDiv.className = 'powered-by-skribbl-essentials';
-    customLogoDiv.innerHTML = 'Powered by Skribbl Essentials 2.0 <img src="https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif" alt="Skribbl Essentials Icon" style="width: 25px; margin-left: 5px;">';
+    customLogoDiv.innerHTML = 'Powered by Skribbl Essentials 2.1 <img src="https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif" alt="Skribbl Essentials Icon" style="width: 25px; margin-left: 5px;">';
 
     GM_addStyle(`
         .powered-by-skribbl-essentials {
@@ -47,7 +47,7 @@
     function changeBackground(imageURL, repeat) {
         const img = new Image();
         img.src = imageURL;
-        img.onload = function () {
+        img.onload = function() {
             const isSquare = img.width === img.height;
             document.body.style.backgroundImage = `url(${imageURL})`;
             document.body.style.backgroundRepeat = isSquare ? 'repeat' : 'no-repeat';
@@ -167,7 +167,7 @@
     }
 
     function loadSettings() {
-        const settingIds = ["item-settings-slots", "item-settings-language", "item-settings-drawtime", "item-settings-rounds", "item-settings-wordcount", "item-settings-hints"];
+        const settingIds = ["item-settings-rounds", "item-settings-slots", "item-settings-language", "item-settings-drawtime", "item-settings-wordcount", "item-settings-hints"];
 
         for (const settingId of settingIds) {
             const value = GM_getValue(settingId);
@@ -326,11 +326,13 @@
     });
 
     const targetNode = document.body;
-    const config = { childList: true, subtree: true };
+    const config = {
+        childList: true,
+        subtree: true
+    };
     observer2.observe(targetNode, config);
 
-    const avatars = [
-        {
+    const avatars = [{
             imageUrl: 'https://raw.githubusercontent.com/Databones/SkribblEssentials/main/avatars/Eyeball.png',
             avatarData: [0, 3, 0],
             name: 'ǱǱǱ       👁👁',
@@ -385,6 +387,13 @@
             name: 'ﾠﾠ          👄',
 
             partsToChange: [2],
+        },
+        {
+            imageUrl: 'https://raw.githubusercontent.com/Databones/SkribblEssentials/main/avatars/Stars.png',
+            avatarData: [0, 0, 0],
+            name: 'ㅤ       ✨',
+
+            partsToChange: [-1],
         },
     ];
 
@@ -493,17 +502,17 @@
             fetch("https://raw.githubusercontent.com/Databones/SkribblEssentials/main/wordList")
                 .then(response => response.text())
                 .then(data => {
-                const timestamp = new Date().getTime();
-                localStorage.setItem("wordListData", JSON.stringify({
-                    timestamp,
-                    data
-                }));
-                wordList = data.split('\n');
-                updateSuggestions();
-            })
+                    const timestamp = new Date().getTime();
+                    localStorage.setItem("wordListData", JSON.stringify({
+                        timestamp,
+                        data
+                    }));
+                    wordList = data.split('\n');
+                    updateSuggestions();
+                })
                 .catch(error => {
-                console.error("Error fetching data:", error);
-            });
+                    console.error("Error fetching data:", error);
+                });
         }
     }
 
@@ -536,6 +545,10 @@
                 button.style.color = 'black';
                 button.style.margin = '5px';
                 button.style.borderRadius = '5px';
+
+                // Set the user-select property to "none"
+                button.style.userSelect = 'none';
+
                 fragment.appendChild(button);
             }
         });
@@ -549,18 +562,26 @@
         debounceTimeout = setTimeout(updateSuggestions, 50);
     });
 
-    suggestionsDiv.addEventListener('click', (event) => {
+    suggestionsDiv.addEventListener('mousedown', (event) => {
         if (event.target.tagName === 'BUTTON') {
+            event.preventDefault();
             const lowercaseWord = event.target.textContent.toLowerCase();
             chatInput.value = lowercaseWord;
             clickedButtons.add(lowercaseWord);
-            const enterKeyEvent = new KeyboardEvent('keydown', {
-                key: 'Enter',
-                keyCode: 13,
+
+            // Trigger an input event on the chat input field
+            const inputEvent = new Event('input', {
                 bubbles: true,
                 cancelable: true,
             });
-            chatInput.dispatchEvent(enterKeyEvent);
+            chatInput.dispatchEvent(inputEvent);
+
+            // Optionally, trigger a submit event if you want to submit the form
+            const submitEvent = new Event('submit', {
+                bubbles: true,
+                cancelable: true,
+            });
+            form.dispatchEvent(submitEvent);
         }
     });
 
@@ -570,7 +591,7 @@
     };
 
     const observer3 = new MutationObserver(updateSuggestions);
-    observer.observe(hintsContainer, observerConfig3);
+    observer3.observe(hintsContainer, observerConfig3);
     const chatObserver = new MutationObserver(updateSuggestions);
     chatObserver.observe(chatContent, {
         childList: true,
