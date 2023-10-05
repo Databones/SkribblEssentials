@@ -12,3 +12,5 @@ Skribbl Essentials has:
 - 🎩 **Hats:** Allows you to wear hats seen by other players using only ASCII characters
 - #️⃣ **Special character usernames:** Allows you to use all special characters by spoofing with lookalikes.
 - 🔤 **Fixed character limit:*** Enjoy an extended 14-character username.
+
+![](https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif)
