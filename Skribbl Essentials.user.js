@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         Skribbl Essentials 2.2
+// @name         Skribbl Essentials 2.3
 // @match        *://skribbl.io/*
 // @author       Databones
 // @description  Provides a list of potential words for skribbl.io
 // @icon         https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif
-// @version      2.2
+// @version      2.3
 // @license      MIT
 // @namespace    skribblessentials
 // @grant        GM_getValue
@@ -70,7 +70,7 @@
    customLogoDiv.style.userSelect = 'none';
    customLogoDiv.style.pointerEvents = 'none';
    customLogoDiv.innerHTML = `
-  Powered by Skribbl Essentials 2.1
+  Powered by Skribbl Essentials 2.3
   <img src="https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif" alt="Skribbl Essentials Icon" style="width: 25px; margin-left: 5px;">
 `;
 
@@ -500,142 +500,143 @@
       panelRight.appendChild(row);
    }
 
-   const isSuggestionsEnabled = GM_getValue('suggestions', true);
-   if (!isSuggestionsEnabled) {
-      return;
+const isSuggestionsEnabled = GM_getValue('suggestions', true);
+if (!isSuggestionsEnabled) {
+   return;
+}
+
+const form = document.querySelector('form');
+const chatInput = document.querySelector('form input[placeholder="Type your guess here..."]');
+const chatContent = document.querySelector('.chat-content');
+const hintsContainer = document.querySelector('.hints .container');
+const suggestionsDiv = document.createElement('div');
+suggestionsDiv.className = 'suggestions';
+suggestionsDiv.style.maxHeight = '150px';
+suggestionsDiv.style.overflowY = 'auto';
+form.appendChild(suggestionsDiv);
+
+const clickedButtons = new Set();
+let wordList = [];
+
+function isWordListValid() {
+   const storedData = localStorage.getItem("wordListData");
+   if (storedData) {
+      const {
+         timestamp,
+         data
+      } = JSON.parse(storedData);
+      const now = new Date().getTime();
+
+      if (now - timestamp <= 24 * 60 * 60 * 1000) {
+         wordList = data.split('\n');
+         return true;
+      }
    }
+   return false;
+}
 
-   const form = document.querySelector('form');
-   const chatInput = document.querySelector('form input[placeholder="Type your guess here..."]');
-   const chatContent = document.querySelector('.chat-content');
-   const hintsContainer = document.querySelector('.hints .container');
-   const suggestionsDiv = document.createElement('div');
-   suggestionsDiv.className = 'suggestions';
-   suggestionsDiv.style.maxHeight = '150px';
-   suggestionsDiv.style.overflowY = 'auto';
-   form.appendChild(suggestionsDiv);
-
-   const clickedButtons = new Set();
-   let wordList = [];
-
-   function isWordListValid() {
-      const storedData = localStorage.getItem("wordListData");
-      if (storedData) {
-         const {
-            timestamp,
-            data
-         } = JSON.parse(storedData);
-         const now = new Date().getTime();
-
-         if (now - timestamp <= 24 * 60 * 60 * 1000) {
+function fetchWordList() {
+   if (!isWordListValid()) {
+      fetch("https://raw.githubusercontent.com/Databones/SkribblEssentials/main/wordList")
+         .then(response => response.text())
+         .then(data => {
+            const timestamp = new Date().getTime();
+            localStorage.setItem("wordListData", JSON.stringify({
+               timestamp,
+               data
+            }));
             wordList = data.split('\n');
-            return true;
-         }
-      }
-      return false;
-   }
-
-   function fetchWordList() {
-      if (!isWordListValid()) {
-         fetch("https://raw.githubusercontent.com/Databones/SkribblEssentials/main/wordList")
-            .then(response => response.text())
-            .then(data => {
-               const timestamp = new Date().getTime();
-               localStorage.setItem("wordListData", JSON.stringify({
-                  timestamp,
-                  data
-               }));
-               wordList = data.split('\n');
-               updateSuggestions();
-            })
-            .catch(error => {
-               console.error("Error fetching data:", error);
-            });
-      }
-   }
-
-   function updateSuggestions() {
-      const inputText = chatInput.value.toLowerCase();
-      const hintElements = hintsContainer.querySelectorAll('.hint');
-      const hintText = Array.from(hintElements).map(element => {
-         if (element.classList.contains('uncover')) {
-            return element.textContent;
-         } else {
-            return element.textContent.replace(/_/g, '[^\\s-]');
-         }
-      }).join('');
-
-      const hintRegExp = new RegExp(`^${hintText}$`, 'i');
-      const chatTextSpans = chatContent.querySelectorAll('p[style*="var(--COLOR_CHAT_TEXT_BASE)"] span');
-      const chatText = Array.from(chatTextSpans).map(span => span.textContent.trim());
-
-      const filteredWords = wordList.filter(word => {
-         return hintRegExp.test(word) && !chatText.includes(word.toLowerCase()) && !clickedButtons.has(word.toLowerCase());
-      });
-
-      suggestionsDiv.innerHTML = '';
-      const fragment = document.createDocumentFragment();
-
-      filteredWords.forEach(word => {
-         if (word.toLowerCase().includes(inputText)) {
-            const button = document.createElement('button');
-            button.textContent = word;
-            button.style.color = 'black';
-            button.style.margin = '5px';
-            button.style.borderRadius = '5px';
-
-            button.style.userSelect = 'none';
-
-            fragment.appendChild(button);
-         }
-      });
-
-      suggestionsDiv.appendChild(fragment);
-   }
-
-   let debounceTimeout;
-   chatInput.addEventListener('input', () => {
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(updateSuggestions, 50);
-   });
-
-   suggestionsDiv.addEventListener('mousedown', (event) => {
-      if (event.target.tagName === 'BUTTON') {
-         event.preventDefault();
-         const lowercaseWord = event.target.textContent.toLowerCase();
-         chatInput.value = lowercaseWord;
-         clickedButtons.add(lowercaseWord);
-
-         const inputEvent = new Event('input', {
-            bubbles: true,
-            cancelable: true,
+            updateSuggestions();
+         })
+         .catch(error => {
+            console.error("Error fetching data:", error);
          });
-         chatInput.dispatchEvent(inputEvent);
+   }
+}
 
-         const submitEvent = new Event('submit', {
-            bubbles: true,
-            cancelable: true,
-         });
-         form.dispatchEvent(submitEvent);
+function updateSuggestions() {
+   const inputText = chatInput.value.toLowerCase();
+   const hintElements = hintsContainer.querySelectorAll('.hint');
+   const hintText = Array.from(hintElements).map(element => {
+      if (element.classList.contains('uncover')) {
+         return element.textContent;
+      } else {
+         return element.textContent.replace(/_/g, '[^\\s-]');
+      }
+   }).join('');
+
+   const hintRegExp = new RegExp(`^${hintText}$`, 'i');
+   const chatTextSpans = chatContent.querySelectorAll('p[style*="var(--COLOR_CHAT_TEXT_BASE)"] span');
+   const chatText = Array.from(chatTextSpans).map(span => span.textContent.trim().toLowerCase()); // Convert to lowercase
+
+   const filteredWords = wordList.filter(word => {
+      return hintRegExp.test(word.toLowerCase()) && !chatText.includes(word.toLowerCase()) && !clickedButtons.has(word.toLowerCase());
+   });
+
+   suggestionsDiv.innerHTML = '';
+   const fragment = document.createDocumentFragment();
+
+   filteredWords.forEach(word => {
+      if (word.toLowerCase().includes(inputText)) { // Convert to lowercase
+         const button = document.createElement('button');
+         button.textContent = word;
+         button.style.color = 'black';
+         button.style.margin = '5px';
+         button.style.borderRadius = '5px';
+
+         button.style.userSelect = 'none';
+
+         fragment.appendChild(button);
       }
    });
 
-   const observerConfig3 = {
-      subtree: true,
-      childList: true
-   };
+   suggestionsDiv.appendChild(fragment);
+}
 
-   const observer3 = new MutationObserver(updateSuggestions);
-   observer3.observe(hintsContainer, observerConfig3);
-   const chatObserver = new MutationObserver(updateSuggestions);
-   chatObserver.observe(chatContent, {
-      childList: true,
-      subtree: true
-   });
+let debounceTimeout;
+chatInput.addEventListener('input', () => {
+   clearTimeout(debounceTimeout);
+   debounceTimeout = setTimeout(updateSuggestions, 50);
+});
 
-   fetchWordList();
+suggestionsDiv.addEventListener('mousedown', (event) => {
+   if (event.target.tagName === 'BUTTON') {
+      event.preventDefault();
+      const lowercaseWord = event.target.textContent.toLowerCase(); // Convert to lowercase
+      chatInput.value = lowercaseWord;
+      clickedButtons.add(lowercaseWord);
 
-   updateSuggestions();
+      const inputEvent = new Event('input', {
+         bubbles: true,
+         cancelable: true,
+      });
+      chatInput.dispatchEvent(inputEvent);
+
+      const submitEvent = new Event('submit', {
+         bubbles: true,
+         cancelable: true,
+      });
+      form.dispatchEvent(submitEvent);
+   }
+});
+
+const observerConfig3 = {
+   subtree: true,
+   childList: true
+};
+
+const observer3 = new MutationObserver(updateSuggestions);
+observer3.observe(hintsContainer, observerConfig3);
+const chatObserver = new MutationObserver(updateSuggestions);
+chatObserver.observe(chatContent, {
+   childList: true,
+   subtree: true
+});
+
+fetchWordList();
+
+updateSuggestions();
+
 
    window.addEventListener('load', changeMaxLength);
 
