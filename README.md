@@ -1,6 +1,6 @@
 ## How do you install Skribbl Essentials? 📜
 1. Install the script managing extension [TamperMonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo).
-2. Install the Skribbl Essentials script [here](https://github.com/Databones/SkribblEssentials/raw/main/Skribbl%20Essentials%20Minified.user.js).
+2. Install the Skribbl Essentials script [here](https://github.com/Databones/SkribblEssentials/raw/main/Skribbl%20Essentials.user.js).
 
 
 # What does Skribbl Essentials do? 🤔
