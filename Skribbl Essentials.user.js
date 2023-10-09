@@ -24,24 +24,24 @@
 (function () {
     'use strict';
 
-    const versionFileURL = 'https://raw.githubusercontent.com/Databones/SkribblEssentials/main/version';
+const versionFileURL = 'https://raw.githubusercontent.com/Databones/SkribblEssentials/main/version';
+const redirectURL = 'https://github.com/Databones/SkribblEssentials/raw/main/Skribbl%20Essentials.user.js';
 
-    const redirectURL = 'https://github.com/Databones/SkribblEssentials/raw/main/Skribbl Essentials.user.js';
+async function fetchRemoteVersion() {
+    const response = await fetch(versionFileURL);
+    const remoteVersion = await response.text();
+    const currentVersion = GM_info.script.version;
 
-    function fetchRemoteVersion() {
-        fetch(versionFileURL)
-            .then(response => response.text())
-            .then(remoteVersion => {
-
-            const currentVersion = GM_info.script.version;
-            if (remoteVersion.trim() !== currentVersion.trim()) {
-
-                window.location.href = redirectURL;
-            }
-        });
+    if (remoteVersion.trim() !== currentVersion.trim()) {
+        window.location.href = redirectURL;
     }
+}
 
+// Ensure your script runs in the appropriate environment before calling fetchRemoteVersion()
+if (typeof GM_info !== 'undefined' && GM_info.script) {
     fetchRemoteVersion();
+}
+
 
     function addStyles(styles) {
         const style = document.createElement('style');
