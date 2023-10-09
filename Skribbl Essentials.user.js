@@ -70,7 +70,7 @@ if (typeof GM_info !== 'undefined' && GM_info.script) {
     customLogoDiv.style.userSelect = 'none';
     customLogoDiv.style.pointerEvents = 'none';
     customLogoDiv.innerHTML = `
-  Powered by Skribbl Essentials 2.4
+  Powered by Skribbl Essentials 2.4.1
   <img src="https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif" alt="Skribbl Essentials Icon" style="width: 25px; margin-left: 5px;">
 `;
 
