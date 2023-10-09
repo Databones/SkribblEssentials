@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name         Skribbl Essentials 2.4
+// @name         Skribbl Essentials 2.4.1
 // @match        *://skribbl.io/*
 // @author       Databones
 // @description  Provides a list of potential words for skribbl.io
-// @icon         https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif
-// @version      2.4
+// @namespace    https://discord.gg/jepPDJS7ra
+// @version      2.4.1
 // @license      MIT
-// @namespace    skribblessentials
+// @icon         https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_addStyle
