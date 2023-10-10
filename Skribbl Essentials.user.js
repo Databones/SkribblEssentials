@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         Skribbl Essentials 2.4.1
+// @name         Skribbl Essentials 2.4.2
 // @match        *://skribbl.io/*
 // @author       Databones
 // @description  Provides a list of potential words for skribbl.io
 // @namespace    https://discord.gg/jepPDJS7ra
-// @version      2.4.1
+// @version      2.4.2
 // @license      MIT
 // @icon         https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif
 // @grant        GM_getValue
@@ -70,7 +70,7 @@ if (typeof GM_info !== 'undefined' && GM_info.script) {
     customLogoDiv.style.userSelect = 'none';
     customLogoDiv.style.pointerEvents = 'none';
     customLogoDiv.innerHTML = `
-  Powered by Skribbl Essentials 2.4.1
+  Powered by Skribbl Essentials 2.4.2
   <img src="https://raw.githubusercontent.com/Databones/SkribblEssentials/main/logoGIF.gif" alt="Skribbl Essentials Icon" style="width: 25px; margin-left: 5px;">
 `;
 
@@ -553,44 +553,44 @@ if (typeof GM_info !== 'undefined' && GM_info.script) {
         }
     }
 
-    function updateSuggestions() {
-        const inputText = chatInput.value.toLowerCase();
-        const hintElements = hintsContainer.querySelectorAll('.hint');
-        const hintText = Array.from(hintElements).map(element => {
-            if (element.classList.contains('uncover')) {
-                return element.textContent;
-            } else {
-                return element.textContent.replace(/_/g, '[^\\s-]');
-            }
-        }).join('');
+function updateSuggestions() {
+    const inputText = chatInput.value.toLowerCase(); // Convert input text to lowercase
+    const hintElements = hintsContainer.querySelectorAll('.hint');
+    const hintText = Array.from(hintElements).map(element => {
+        if (element.classList.contains('uncover')) {
+            return element.textContent;
+        } else {
+            return element.textContent.replace(/_/g, '[^\\s-]');
+        }
+    }).join('');
 
-        const hintRegExp = new RegExp(`^${hintText}$`);
-        const chatTextSpans = chatContent.querySelectorAll('p[style*="var(--COLOR_CHAT_TEXT_BASE)"] span');
-        const chatText = Array.from(chatTextSpans).map(span => span.textContent.trim().toLowerCase());
+    const hintRegExp = new RegExp(`^${hintText}$`, 'i'); // Use 'i' flag for case-insensitive matching
+    const chatTextSpans = chatContent.querySelectorAll('p[style*="var(--COLOR_CHAT_TEXT_BASE)"] span');
+    const chatText = Array.from(chatTextSpans).map(span => span.textContent.trim().toLowerCase());
 
-        const filteredWords = wordList.filter(word => {
-            return hintRegExp.test(word) && !chatText.includes(word.toLowerCase()) && !clickedButtons.has(word.toLowerCase());
-        });
+    const filteredWords = wordList.filter(word => {
+        return hintRegExp.test(word.toLowerCase()) && !chatText.includes(word.toLowerCase()) && !clickedButtons.has(word.toLowerCase());
+    });
 
-        suggestionsDiv.innerHTML = '';
-        const fragment = document.createDocumentFragment();
+    suggestionsDiv.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
-        filteredWords.forEach(word => {
-            if (word.includes(inputText)) {
-                const button = document.createElement('button');
-                button.textContent = word;
-                button.style.color = 'black';
-                button.style.margin = '5px';
-                button.style.borderRadius = '5px';
+    filteredWords.forEach(word => {
+        if (word.toLowerCase().includes(inputText)) { // Convert word to lowercase before comparison
+            const button = document.createElement('button');
+            button.textContent = word;
+            button.style.color = 'black';
+            button.style.margin = '5px';
+            button.style.borderRadius = '5px';
 
-                button.style.userSelect = 'none';
+            button.style.userSelect = 'none';
 
-                fragment.appendChild(button);
-            }
-        });
+            fragment.appendChild(button);
+        }
+    });
 
-        suggestionsDiv.appendChild(fragment);
-    }
+    suggestionsDiv.appendChild(fragment);
+}
 
 
 
